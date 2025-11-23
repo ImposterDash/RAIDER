@@ -11,7 +11,7 @@ Instead of hard-coded scripts, RAIDER uses a Q-Learning "Commander" to decide *w
 
 RAIDER operates using a **Blackboard Architecture** where specialized agents collaborate:
 
-1.  [cite_start]**The Commander (RL Core)** 
+1.  **The Commander (RL Core)** 
     * **Logic:** Q-Learning (Reinforcement Learning).
     * **Role:** Learns the optimal "Kill Chain" order. It is rewarded for capturing flags and punished for premature attacks or stagnation.
 2.  **The Discovery Agent (Recon)**
@@ -64,7 +64,7 @@ The Python library (`python-nmap`) is only a wrapper.
 ## Usage
 
 ### 1. Quick Start (Mock Mode)
-To see RAIDER in action without an external target, simply run the main script and press **ENTER** when prompted for a URL. [cite_start]This launches a local vulnerable Flask server (The "SecureCorp Bank").
+To see RAIDER in action without an external target, simply run the main script and press **ENTER** when prompted for a URL. This launches a local vulnerable Flask server (The "SecureCorp Bank").
 
 ```bash
 python main.py
