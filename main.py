@@ -39,7 +39,7 @@ def main():
         print("❌ ERROR: Please add GEMINI_API_KEY to .env file")
         return
 
-    print(f"{Fore.YELLOW}=== AI RED TEAM MISSION CONTROL ==={Fore.RESET}")
+    print(f"{Fore.YELLOW}=== RAIDER MISSION CONTROL ==={Fore.RESET}")
     user_input = input("Enter Target URL (or press Enter for Localhost): ")
 
     target_ip = "127.0.0.1"
