@@ -1,0 +1,9 @@
+google-generativeai
+selenium
+beautifulsoup4
+flask
+python-dotenv
+webdriver-manager
+colorama
+python-nmap
+numpy

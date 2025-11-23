@@ -1,0 +1,101 @@
+import threading
+import time
+import os
+import socket
+from urllib.parse import urlparse
+from dotenv import load_dotenv
+from mock_target import run_server
+from blackboard import Blackboard
+from coordination_core import CoordinationCore
+from agents_recon import ReconAgent
+from agents_exploit import ExploitAgent
+from colorama import Fore, Style, init
+
+init()
+load_dotenv()
+API_KEY = os.getenv("GEMINI_API_KEY")
+
+def resolve_target(user_input):
+    print(f"{Fore.CYAN}[System] Resolving Target: '{user_input}'...{Fore.RESET}")
+    target = user_input.strip()
+    
+    # Extract Hostname
+    hostname = target
+    if "://" in target:
+        parsed = urlparse(target)
+        hostname = parsed.netloc.split(':')[0]
+    else:
+        hostname = target.split('/')[0].split(':')[0]
+
+    # Resolve IP
+    try:
+        ip_address = socket.gethostbyname(hostname)
+        print(f"{Fore.GREEN}[System] DNS Resolution: {hostname} -> {ip_address}{Fore.RESET}")
+        return ip_address
+    except socket.gaierror:
+        print(f"{Fore.RED}[Error] Could not resolve hostname '{hostname}'.{Fore.RESET}")
+        return None
+
+def main():
+    if not API_KEY:
+        print("❌ ERROR: Please add GEMINI_API_KEY to .env file")
+        return
+
+    print(f"{Fore.YELLOW}=== AI RED TEAM MISSION CONTROL ==={Fore.RESET}")
+    user_input = input("Enter Target URL (or press Enter for Localhost): ")
+
+    target_ip = "127.0.0.1"
+    target_url = "http://127.0.0.1:5000" # Default local URL
+
+    if user_input:
+        target_ip = resolve_target(user_input)
+        target_url = user_input # KEEP THE FULL URL
+        if not target_ip: return
+    else:
+        print(f"{Fore.BLUE}[System] Launching Local Mock Server...{Fore.RESET}")
+        server = threading.Thread(target=run_server)
+        server.daemon = True
+        server.start()
+        time.sleep(1)
+
+    # 1. Initialize Blackboard
+    bb = Blackboard()
+    bb.state["target_ip"] = target_ip 
+    bb.state["target_url"] = target_url # Store the full link for the Exploit Agent
+    
+    # 2. Init Agents
+    commander = CoordinationCore(bb)
+    recon_team = ReconAgent(bb)
+    exploit_team = ExploitAgent(bb, API_KEY)
+
+    # 3. Mission Loop
+    print(f"{Fore.YELLOW}=== MISSION STARTING AGAINST {target_url} ==={Fore.RESET}")
+    
+    for step in range(15):
+        print(f"\n--- Mission Step {step+1} ---")
+        
+        current_state_key = commander.get_state_key()
+        action_name, action_idx = commander.choose_action()
+        print(f"{Fore.MAGENTA}[Commander] Decision: {action_name}{Fore.RESET}")
+        
+        if action_name == "DEPLOY_RECON":
+            recon_team.run()
+        elif action_name == "DEPLOY_EXPLOIT":
+            exploit_team.run()
+        elif action_name == "WAIT":
+            print("Standing by...")
+
+        new_state_key = commander.get_state_key()
+        reward = commander.calculate_reward(current_state_key, new_state_key, action_name)
+        commander.learn(current_state_key, action_idx, reward, new_state_key)
+        
+        print(f"[RL] Reward: {reward} | Flag Captured: {bb.state['flag_captured']}")
+        
+        if bb.state["flag_captured"]:
+            print(f"\n{Fore.GREEN}MISSION ACCOMPLISHED. Exiting.{Fore.RESET}")
+            break
+            
+        time.sleep(1)
+
+if __name__ == "__main__":
+    main()
