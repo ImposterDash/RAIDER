@@ -84,3 +84,10 @@ Enter Target URL (or press Enter for Localhost): # Enter the URL of the target w
 
 * A list of few sample live target websites is available in ```sample_live_targets.md```.
 
+## Disclaimer
+### DISCLAIMER: FOR EDUCATIONAL PURPOSES ONLY.
+
+RAIDER is a proof-of-concept tool designed for **authorized security research** and **capture-the-flag (CTF) challenges**.
+
+* Do not use this tool against targets you do not have explicit permission to test.
+* The developer is not responsible for any misuse of this software.
