@@ -19,7 +19,6 @@ def resolve_target(user_input):
     print(f"{Fore.CYAN}[System] Resolving Target: '{user_input}'...{Fore.RESET}")
     target = user_input.strip()
     
-    # Extract Hostname
     hostname = target
     if "://" in target:
         parsed = urlparse(target)
@@ -27,7 +26,6 @@ def resolve_target(user_input):
     else:
         hostname = target.split('/')[0].split(':')[0]
 
-    # Resolve IP
     try:
         ip_address = socket.gethostbyname(hostname)
         print(f"{Fore.GREEN}[System] DNS Resolution: {hostname} -> {ip_address}{Fore.RESET}")
@@ -45,11 +43,11 @@ def main():
     user_input = input("Enter Target URL (or press Enter for Localhost): ")
 
     target_ip = "127.0.0.1"
-    target_url = "http://127.0.0.1:5000" # Default local URL
+    target_url = "http://127.0.0.1:5000"
 
     if user_input:
         target_ip = resolve_target(user_input)
-        target_url = user_input # KEEP THE FULL URL
+        target_url = user_input
         if not target_ip: return
     else:
         print(f"{Fore.BLUE}[System] Launching Local Mock Server...{Fore.RESET}")
@@ -58,17 +56,14 @@ def main():
         server.start()
         time.sleep(1)
 
-    # 1. Initialize Blackboard
     bb = Blackboard()
     bb.state["target_ip"] = target_ip 
-    bb.state["target_url"] = target_url # Store the full link for the Exploit Agent
+    bb.state["target_url"] = target_url
     
-    # 2. Init Agents
     commander = CoordinationCore(bb)
     recon_team = ReconAgent(bb)
     exploit_team = ExploitAgent(bb, API_KEY)
 
-    # 3. Mission Loop
     print(f"{Fore.YELLOW}=== MISSION STARTING AGAINST {target_url} ==={Fore.RESET}")
     
     for step in range(15):

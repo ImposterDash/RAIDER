@@ -3,8 +3,8 @@ import json
 class Blackboard:
     def __init__(self):
         self.state = {
-            "target_ip": "",          # For Nmap (e.g., 44.228.249.3)
-            "target_url": "",         # For Exploit (e.g., http://site.com/login)
+            "target_ip": "",
+            "target_url": "",
             "status": "IDLE",         
             "scanned": False,
             "ports": {},              

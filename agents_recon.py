@@ -17,10 +17,8 @@ class ReconAgent:
         
         if self.nm:
             try:
-                # Fast but broad scan
                 self.nm.scan(target, arguments='-p 80,443,3000,5000,8000,8080 -sV -T4')
                 found = {}
-                # Simplified logic for brevity
                 if target in self.nm.all_hosts() and 'tcp' in self.nm[target]:
                     for port, info in self.nm[target]['tcp'].items():
                         state = info['state']

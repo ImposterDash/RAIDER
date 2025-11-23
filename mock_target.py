@@ -2,13 +2,11 @@ from flask import Flask, request, render_template_string, redirect, url_for
 import threading
 import logging
 
-# Suppress logs
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
 app = Flask(__name__)
 
-# HTML Templates
 LOGIN_PAGE = """
 <!DOCTYPE html>
 <html>
@@ -59,12 +57,9 @@ def home():
 def login():
     user = request.form.get('username', '')
     
-    # VULNERABILITY 1: Raw SQL Error (The Trap)
     if user == "'":
         return render_template_string(SQL_ERROR_PAGE), 500
         
-    # VULNERABILITY 2: SQL Injection Bypass (The Win)
-    # Checks for typical SQLi payloads
     if "' OR 1=1" in user.upper() or '" OR 1=1' in user.upper() or "ADMIN' --" in user.upper():
         return redirect(url_for('dashboard'))
         

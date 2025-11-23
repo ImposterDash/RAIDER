@@ -15,14 +15,13 @@ class CoordinationCore:
         self.load_brain()
 
     def get_state_key(self):
-        return self.board.get_rl_state() # Tuple: (Scanned, Has_Http, Has_Vuln, Flag)
+        return self.board.get_rl_state()
 
     def choose_action(self):
         state = self.get_state_key()
         if state not in self.q_table:
             self.q_table[state] = np.zeros(len(self.actions))
 
-        # Epsilon Greedy
         if np.random.uniform() < self.epsilon:
             action_idx = np.argmax(self.q_table[state])
         else:
@@ -41,24 +40,18 @@ class CoordinationCore:
         self.save_brain()
 
     def calculate_reward(self, prev_state, new_state, action):
-        # Reward Logic
-        # prev: (Scanned, Http, Vuln, Flag)
         
-        reward = -1 # Living penalty (Time is money)
+        reward = -1
         
-        # If we captured the flag
         if new_state[3] and not prev_state[3]:
             return 100 
             
-        # If we scanned and found HTTP (Progress)
         if new_state[0] and not prev_state[0] and action == "DEPLOY_RECON":
             return 10
             
-        # Punishment: Deploying Exploit before Scanning
         if action == "DEPLOY_EXPLOIT" and not prev_state[0]:
             return -50
 
-        # Punishment: Deploying Recon again if already scanned
         if action == "DEPLOY_RECON" and prev_state[0]:
             return -10
 

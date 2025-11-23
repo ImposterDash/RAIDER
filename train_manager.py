@@ -22,8 +22,6 @@ class MockExploitAgent:
     def run(self):
         ports = self.board.state["ports"]
         if any('http' in s for s in ports.values()):
-            # SIMULATE REAL WORLD DIFFICULTY
-            # 70% chance to succeed, 30% chance to fail
             if random.random() > 0.3: 
                 self.board.set_flag("FLAG{TRAINING_DUMMY}")
                 return "ATTACK_SUCCESS"
@@ -36,9 +34,9 @@ def train():
     print(f"{Fore.CYAN}=== STARTING ROBUST TRAINING SIMULATION ==={Fore.RESET}")
     dummy_board = Blackboard()
     commander = CoordinationCore(dummy_board)
-    commander.epsilon = 0.6 # High exploration
+    commander.epsilon = 0.6
     
-    episodes = 100 # Train for more episodes
+    episodes = 100
     
     for episode in range(episodes):
         bb = Blackboard()
@@ -67,8 +65,6 @@ def train():
             new_state = commander.get_state_key()
             reward = commander.calculate_reward(state, new_state, action)
             
-            # EXTRA PUNISHMENT FOR STAGNATION
-            # If state didn't change (e.g. Exploit failed), punish heavily
             if state == new_state and action == "DEPLOY_EXPLOIT":
                 reward -= 20 
 
