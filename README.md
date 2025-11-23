@@ -84,6 +84,8 @@ Enter Target URL (or press Enter for Localhost): # Enter the URL of the target w
 
 * A list of few sample live target websites is available in ```sample_live_targets.md```.
 
+---
+
 ## Disclaimer
 ### DISCLAIMER: FOR EDUCATIONAL PURPOSES ONLY.
 
