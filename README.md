@@ -44,7 +44,7 @@ The Python library (`python-nmap`) is only a wrapper.
 
 1.  **Clone the repository**
     ```bash
-    git clone [https://github.com/ayushgayakwad/RAIDER.git](https://github.com/ayushgayakwad/RAIDER.git)
+    git clone https://github.com/ayushgayakwad/RAIDER.git
     cd RAIDER
     ```
 
