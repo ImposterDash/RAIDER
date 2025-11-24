@@ -32,13 +32,13 @@ RAIDER operates using a **Blackboard Architecture** where specialized agents col
 **You must install the Nmap application on your system.**
 The Python library (`python-nmap`) is only a wrapper.
 
-* **Windows:**
+* **Windows:**  
     * Download the setup `.exe` from the official website: [https://nmap.org/download.html](https://nmap.org/download.html)
-* **Linux (Debian/Ubuntu):**
+* **Linux (Debian/Ubuntu):**  
     ```bash
     sudo apt-get install nmap
     ```
-* **macOS:**
+* **macOS:**  
     ```bash
     brew install nmap
     ```
