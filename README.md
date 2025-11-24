@@ -54,7 +54,7 @@ The Python library (`python-nmap`) is only a wrapper.
     ```
 
 3.  **Environment Configuration**
-    Create a ```.env``` file in the root directory and add your Gemini API key:
+    Create a ```.env``` file in the root directory and add your Gemini API key (https://aistudio.google.com/api-keys):
     ```env
     GEMINI_API_KEY=your_actual_api_key_here
     ```
