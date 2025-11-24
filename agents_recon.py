@@ -14,7 +14,7 @@ class ReconAgent:
 
     def run(self):
         target = self.board.state["target_ip"]
-        print(f"{Fore.BLUE}[Recon] Starting FAST Scan on {target}...{Fore.RESET}")
+        print(f"{Fore.BLUE}[Recon] Starting Scan on {target}...{Fore.RESET}")
         
         if self.nm:
             try:
