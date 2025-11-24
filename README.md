@@ -15,7 +15,7 @@ RAIDER operates using a **Blackboard Architecture** where specialized agents col
     * **Logic:** Q-Learning (Reinforcement Learning).
     * **Role:** Learns the optimal "Kill Chain" order. It is rewarded for capturing flags and punished for premature attacks or stagnation.
 2.  **The Discovery Agent (Recon)**
-    * **Tools:** Nmap (Port Scanner) + Script Engine (```--script```).
+    * **Tools:** Nmap + Script Engine (```--script```).
     * **Role:** Identifies open ports, detects Operating Systems, fingerprints services, and scans for known vulnerabilities (CVEs).
 3.  **The Intelligent Agent (Exploit)**
     * **Tools:** Google Gemini + Selenium.
