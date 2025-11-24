@@ -112,7 +112,7 @@ Enter Target URL (or press Enter for Localhost): # Enter the URL of the target w
 | `main.py` | The entry point. Initializes the Blackboard, Agents, and starts the mission loop. |
 | `coordination_core.py` | Contains the RL logic (Q-Table) and reward calculation. |
 | `agents_exploit.py` | The LLM-driven agent. Uses Selenium to navigate and Gemini to generate attacks. |
-| `agents_recon.py` | The scanner agent. Wraps Nmap to find open ports. |
+| `agents_recon.py` | The scanner agent. Wraps Nmap to perform deep inspection. |
 | `blackboard.py` | Shared memory state. Agents read/write findings here. |
 | `reporting.py` | Generates professional PDF audit reports from mission data. |
 | `mock_target.py` | A vulnerable Flask application used for training and demo purposes. |
