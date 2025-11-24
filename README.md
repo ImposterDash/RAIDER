@@ -15,11 +15,14 @@ RAIDER operates using a **Blackboard Architecture** where specialized agents col
     * **Logic:** Q-Learning (Reinforcement Learning).
     * **Role:** Learns the optimal "Kill Chain" order. It is rewarded for capturing flags and punished for premature attacks or stagnation.
 2.  **The Discovery Agent (Recon)**
-    * **Tools:** Nmap (Port Scanner).
-    * **Role:** Identifies open ports (HTTP, SSH, etc.) and surfaces the attack landscape to the Blackboard.
+    * **Tools:** Nmap (Port Scanner) + Script Engine (```--script```).
+    * **Role:** Identifies open ports, detects Operating Systems, fingerprints services, and scans for known vulnerabilities (CVEs).
 3.  **The Intelligent Agent (Exploit)**
     * **Tools:** Google Gemini + Selenium.
     * **Role:** Parses HTML structures, identifies login forms, and generates bespoke SQL injection payloads based on previous failure logs.
+4.  **The Reporter**
+    * **Tools:** FPDF.
+    * **Role:** Compiles all agent findings, logs, and evidence into a professional PDF audit report at the end of the mission.
 
 ---
 
@@ -74,15 +77,26 @@ Enter Target URL (or press Enter for Localhost): # Just press Enter to activate 
 * **Target**: http://127.0.0.1:5000
 * **Goal**: Bypass the login screen and capture the flag ```FLAG{MULTI_AGENT_DOMINATION}```.
 
-### 2. Live Targeting
+### 2. Live Targeting (Admin Rights Recommended)
 You can point RAIDER at a specific URL or IP address (ensure you have permission!).
 
+For Deep Recon (OS Detection & UDP Scans), run the script with Administrator/Root privileges.
+
+**Windows (PowerShell as Admin):**
 ```bash
 python main.py
 Enter Target URL (or press Enter for Localhost): # Enter the URL of the target website
 ```
 
+**Linux/Mac:**
+```bash
+sudo python main.py
+Enter Target URL (or press Enter for Localhost): # Enter the URL of the target website
+```
+
 * A list of few sample live target websites is available in ```sample_live_targets.md```.
+
+* **Output:** Upon completion, RAIDER generates a ```Mission_Report_YYYYMMDD.pdf``` containing a timeline of attacks, vulnerabilities found, and system details.
 
 ---
 
@@ -95,6 +109,7 @@ Enter Target URL (or press Enter for Localhost): # Enter the URL of the target w
 | `agents_exploit.py` | The LLM-driven agent. Uses Selenium to navigate and Gemini to generate attacks. |
 | `agents_recon.py` | The scanner agent. Wraps Nmap to find open ports. |
 | `blackboard.py` | Shared memory state. Agents read/write findings here. |
+| `reporting.py` | Generates professional PDF audit reports from mission data. |
 | `mock_target.py` | A vulnerable Flask application used for training and demo purposes. |
 | `mission_control.pkl` | The serialized "brain" of the RL agent (saved Q-Table). |
 

@@ -9,6 +9,7 @@ from blackboard import Blackboard
 from coordination_core import CoordinationCore
 from agents_recon import ReconAgent
 from agents_exploit import ExploitAgent
+from reporting import Reporter
 from colorama import Fore, Style, init
 
 init()
@@ -87,10 +88,15 @@ def main():
         print(f"[RL] Reward: {reward} | Flag Captured: {bb.state['flag_captured']}")
         
         if bb.state["flag_captured"]:
-            print(f"\n{Fore.GREEN}MISSION ACCOMPLISHED. Exiting.{Fore.RESET}")
+            print(f"\n{Fore.GREEN}MISSION ACCOMPLISHED.{Fore.RESET}")
             break
             
         time.sleep(1)
+
+    print(f"\n{Fore.CYAN}[System] Generating Mission Report...{Fore.RESET}")
+    reporter = Reporter(bb)
+    report_file = reporter.generate_report()
+    print(f"{Fore.GREEN}[System] Report saved to: {report_file}{Fore.RESET}")
 
 if __name__ == "__main__":
     main()

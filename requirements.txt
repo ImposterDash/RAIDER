@@ -7,3 +7,4 @@ webdriver-manager
 colorama
 python-nmap
 numpy
+fpdf
