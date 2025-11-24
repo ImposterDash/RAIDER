@@ -1,5 +1,6 @@
 import json
 import datetime
+from colorama import Fore, Style
 
 class Blackboard:
     def __init__(self):
@@ -39,18 +40,27 @@ class Blackboard:
         self.state["scanned"] = True
         self.log_event("Blackboard", "Scan Data Updated", f"Found {len(self.state['ports'])} ports")
         
-        print(f"\n[Blackboard] SCAN UPDATE:")
+        print(f"\n{Fore.CYAN}[Blackboard] INTELLIGENCE UPDATE:{Fore.RESET}")
         print(f"   :: Open Ports: {list(self.state['ports'].keys())}")
+        
+        os_disp = self.state['os_info']
+        if os_disp == "Unknown": os_disp = "Unknown (Cloud/Firewall Protected)"
+            
+        mac_disp = self.state['mac_address']
+        if mac_disp == "Unknown": mac_disp = "Unknown (Remote Target - Layer 2 Hidden)"
+            
+        print(f"   :: OS Detected: {os_disp}")
+        print(f"   :: MAC Address: {mac_disp}")
 
     def add_vuln(self, vuln_desc):
         self.state["vulnerabilities"].append(vuln_desc)
         self.log_event("Blackboard", "Vulnerability Confirmed", vuln_desc)
-        print(f"[Blackboard] Vulnerability Logged: {vuln_desc}")
+        print(f"{Fore.RED}[Blackboard] Vulnerability Logged: {vuln_desc}{Fore.RESET}")
 
     def set_flag(self, flag):
         self.state["flag_captured"] = True
         self.log_event("Blackboard", "OBJECTIVE COMPLETED", f"Flag: {flag}")
-        print(f"\n[Blackboard] CRITICAL: Flag Captured -> {flag}")
+        print(f"\n{Fore.GREEN}[Blackboard] CRITICAL: Flag Captured -> {flag}{Fore.RESET}")
 
     def get_rl_state(self):
         has_http = any(s == 'http' or s == 'http-alt' for s in self.state["ports"].values())
