@@ -57,7 +57,7 @@ class ReconAgent:
                                     for script_id, output in info['script'].items():
                                         clean_output = output.strip().replace('\n', ' ')[:60]
                                         print(f"      [!] {script_id}: {clean_output}...")
-                                        scan_results["vulns"].append(f"Port {port}: {script_id}")
+                                        scan_results["vulns"].append(f"Port {port}: {script_id} | {clean_output}")
 
                     if 'osmatch' in host_data and host_data['osmatch']:
                         best_match = host_data['osmatch'][0]
@@ -89,6 +89,6 @@ class ReconAgent:
             "os": "Linux Kernel 5.x (Ubuntu)",
             "mac": "00:1A:2B:3C:4D:5E (VirtualBox)",
             "hops": ["192.168.1.1"],
-            "vulns": ["http-sql-injection"]
+            "vulns": ["Port 5000: http-sql-injection | Possible time-based blind injection detected"]
         }
         self.board.update_scan(mock_data)

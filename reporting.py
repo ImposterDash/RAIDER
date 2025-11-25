@@ -30,9 +30,18 @@ class Reporter:
     def __init__(self, blackboard):
         self.board = blackboard
         self.filename = f"Mission_Report_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+        
+        self.nmap_explanations = {
+            "http-server-header": "Version Disclosure: The server broadcasts its specific software version (e.g., Apache 2.4.x), helping attackers find specific CVEs.",
+            "http-headers": "Header Analysis: Indicates potential missing security headers (like HSTS, X-Frame-Options) or information leakage in custom headers.",
+            "http-methods": "Dangerous Methods: The server may allow risky HTTP methods like PUT, DELETE, or TRACE, which can lead to file uploads or cross-site tracing.",
+            "http-title": "Reconnaissance Data: The page title reveals the application identity (e.g., 'Jenkins', 'Admin Dashboard'), aiding targeted attacks.",
+            "http-sql-injection": "SQL Injection Risk: Automated heuristics suggest input fields on this port interact insecurely with the backend database.",
+            "http-git": "Git Repository Found: The .git directory is exposed, allowing attackers to download the entire source code.",
+            "ssl-cert": "SSL Certificate Info: Checks for expired certificates, weak ciphers, or self-signed certificates that facilitate Man-in-the-Middle attacks."
+        }
 
     def clean_text(self, text):
-        """Removes non-latin characters that might crash FPDF"""
         return text.encode('latin-1', 'replace').decode('latin-1')
 
     def generate_report(self):
@@ -42,16 +51,16 @@ class Reporter:
         
         pdf.chapter_title("1. Executive Summary")
         status = "CRITICAL COMPROMISE" if state['flag_captured'] else "SECURE"
-        summary = f"""
-        Target Host: {state['target_ip']}
-        Target URL: {state['target_url']}
-        Scan Date: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-        Final Status: {status}
         
-        The Raider AI System performed an automated security assessment. 
-        Total Open Ports: {len(state['ports'])}
-        Total Vulnerabilities: {len(state['vulnerabilities']) + len(state['network_vulns'])}
-        """
+        summary = (
+            f"Target Host: {state['target_ip']}\n"
+            f"Target URL: {state['target_url']}\n"
+            f"Scan Date: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+            f"Final Status: {status}\n\n"
+            f"The Raider AI System performed an automated security assessment.\n"
+            f"Total Open Ports: {len(state['ports'])}\n"
+            f"Total Vulnerabilities: {len(state['vulnerabilities']) + len(state['network_vulns'])}"
+        )
         pdf.chapter_body(summary)
 
         pdf.chapter_title("2. Network Intelligence")
@@ -85,8 +94,38 @@ class Reporter:
                 pdf.set_font('Arial', 'B', 10)
                 pdf.cell(0, 10, "Network Service Vulnerabilities (Nmap Scripts):", 0, 1)
                 pdf.set_font('Arial', '', 10)
+
                 for nv in state['network_vulns']:
-                    pdf.multi_cell(0, 5, f" - {self.clean_text(nv)}")
+                    parts = nv.split('|', 1)
+                    main_header = parts[0].strip()
+                    detail = parts[1].strip() if len(parts) > 1 else None
+
+                    pdf.set_text_color(0, 0, 0)
+                    pdf.multi_cell(0, 5, f" - {self.clean_text(main_header)}")
+                    
+                    if detail:
+                        pdf.set_font('Courier', '', 8)
+                        pdf.set_x(15)
+                        pdf.multi_cell(0, 4, f"Output: {self.clean_text(detail)}")
+                        pdf.set_font('Arial', '', 10)
+                    
+                    try:
+                        script_name = main_header.split(':')[1].strip()
+                        if script_name in self.nmap_explanations:
+                            pdf.set_font('Arial', 'I', 9)
+                            pdf.set_text_color(80, 80, 80)
+                            
+                            explanation = self.nmap_explanations[script_name]
+                            pdf.set_x(15)
+                            pdf.multi_cell(0, 5, f"Analysis: {explanation}")
+                            
+                            pdf.set_font('Arial', '', 10) 
+                            pdf.set_text_color(0, 0, 0)   
+                            pdf.ln(1)
+                    except:
+                        pass
+                    
+                    if not detail: pdf.ln(1)
 
         pdf.ln(10)
 
