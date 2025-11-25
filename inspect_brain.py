@@ -14,7 +14,6 @@ if not os.path.exists(filename):
 with open(filename, "rb") as f:
     q_table = pickle.load(f)
 
-# MUST match the actions list in coordination_core.py
 actions = ["DEPLOY_RECON", "DEPLOY_SQLI", "DEPLOY_XSS", "WAIT"]
 
 print(f"\n{Fore.CYAN}=== REINFORCEMENT LEARNING BRAIN DUMP ==={Fore.RESET}")
@@ -26,7 +25,6 @@ sorted_states = sorted(q_table.keys(), key=lambda x: str(x))
 for state in sorted_states:
     values = q_table[state]
     
-    # Handle cases where the brain file might still have old 3-action data
     if len(values) != len(actions):
         print(f"{str(state):<40} | {Fore.RED}CORRUPT/OLD{Fore.RESET}   | {values}")
         continue
@@ -34,7 +32,6 @@ for state in sorted_states:
     best_action_idx = np.argmax(values)
     best_action = actions[best_action_idx]
     
-    # Color coding for readability
     action_color = Fore.WHITE
     if best_action == "DEPLOY_RECON": action_color = Fore.BLUE
     elif best_action == "DEPLOY_SQLI": action_color = Fore.RED
