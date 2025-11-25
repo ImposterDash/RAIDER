@@ -1,6 +1,7 @@
 import time
 import numpy as np
 import random
+import os
 from blackboard import Blackboard
 from coordination_core import CoordinationCore
 from colorama import Fore, Style, init
@@ -12,18 +13,44 @@ class MockReconAgent:
         self.board = blackboard
 
     def run(self):
-        self.board.update_scan({5000: 'http', 22: 'ssh'})
+        # FIX: The data must be wrapped in a "ports" key to match Blackboard structure
+        scan_data = {
+            "ports": {5000: 'http', 22: 'ssh'},
+            "os": "Linux (Mock)",
+            "mac": "AA:BB:CC:DD:EE:FF"
+        }
+        self.board.update_scan(scan_data)
         return "SCAN_COMPLETE"
 
-class MockExploitAgent:
+class MockSQLIAgent:
     def __init__(self, blackboard):
         self.board = blackboard
 
     def run(self):
         ports = self.board.state["ports"]
+        # Can only attack if HTTP is found
         if any('http' in s for s in ports.values()):
+            # 70% chance of success for training purposes
             if random.random() > 0.3: 
-                self.board.set_flag("FLAG{TRAINING_DUMMY}")
+                self.board.set_flag("FLAG{TRAINING_SQLI_DUMMY}")
+                return "ATTACK_SUCCESS"
+            else:
+                return "ATTACK_FAILED"
+        else:
+            return "ATTACK_FAILED"
+
+class MockXSSAgent:
+    def __init__(self, blackboard):
+        self.board = blackboard
+
+    def run(self):
+        ports = self.board.state["ports"]
+        # Can only attack if HTTP is found
+        if any('http' in s for s in ports.values()):
+            # 70% chance of success for training purposes
+            if random.random() > 0.3: 
+                self.board.add_vuln("Reflected XSS found (Simulated)")
+                self.board.set_flag("FLAG{TRAINING_XSS_DUMMY}")
                 return "ATTACK_SUCCESS"
             else:
                 return "ATTACK_FAILED"
@@ -31,42 +58,58 @@ class MockExploitAgent:
             return "ATTACK_FAILED"
 
 def train():
-    print(f"{Fore.CYAN}=== STARTING ROBUST TRAINING SIMULATION ==={Fore.RESET}")
+    print(f"{Fore.CYAN}=== STARTING ROBUST TRAINING SIMULATION (SQLi + XSS) ==={Fore.RESET}")
+    
+    # Recommendation: Delete old brain to start fresh if structure changed
+    if os.path.exists("mission_control.pkl"):
+        print(f"{Fore.YELLOW}[System] Note: Using existing brain. If behavior is poor, delete 'mission_control.pkl' and retry.{Fore.RESET}")
+
     dummy_board = Blackboard()
     commander = CoordinationCore(dummy_board)
     commander.epsilon = 0.6
     
-    episodes = 100
+    episodes = 200 
     
     for episode in range(episodes):
         bb = Blackboard()
         commander.board = bb
+        
         recon = MockReconAgent(bb)
-        exploit = MockExploitAgent(bb)
+        sqli = MockSQLIAgent(bb)
+        xss = MockXSSAgent(bb)
         
         steps = 0
         total_reward = 0
         done = False
         
-        if episode > 70: commander.epsilon = 0.95
+        # Annealing Epsilon (Explore less as we learn more)
+        if episode > 50: commander.epsilon = 0.8
+        if episode > 100: commander.epsilon = 0.9
+        if episode > 150: commander.epsilon = 0.98
         
         print(f"Episode {episode+1}: ", end="")
         
-        while not done and steps < 15:
+        while not done and steps < 20:
             steps += 1
             state = commander.get_state_key()
             action, action_idx = commander.choose_action()
             
+            # Execute Actions
             if action == "DEPLOY_RECON":
                 recon.run()
-            elif action == "DEPLOY_EXPLOIT":
-                exploit.run()
+            elif action == "DEPLOY_SQLI":
+                sqli.run()
+            elif action == "DEPLOY_XSS":
+                xss.run()
+            elif action == "WAIT":
+                pass
             
             new_state = commander.get_state_key()
             reward = commander.calculate_reward(state, new_state, action)
             
-            if state == new_state and action == "DEPLOY_EXPLOIT":
-                reward -= 20 
+            # Manual shaping: Punish repeating same attack if state didn't change
+            if state == new_state and (action == "DEPLOY_SQLI" or action == "DEPLOY_XSS"):
+                reward -= 10 
 
             commander.learn(state, action_idx, reward, new_state)
             total_reward += reward
@@ -82,6 +125,7 @@ def train():
 
     print(f"\n{Fore.YELLOW}Training Complete.{Fore.RESET}")
     commander.save_brain()
+    print(f"{Fore.CYAN}Brain saved to 'mission_control.pkl'{Fore.RESET}")
 
 if __name__ == "__main__":
     train()

@@ -7,7 +7,8 @@ class CoordinationCore:
     def __init__(self, blackboard):
         self.board = blackboard
         self.q_table = {} 
-        self.actions = ["DEPLOY_RECON", "DEPLOY_EXPLOIT", "WAIT"]
+        # UPDATED ACTIONS: Now distinguishes between SQLi and XSS
+        self.actions = ["DEPLOY_RECON", "DEPLOY_SQLI", "DEPLOY_XSS", "WAIT"]
         self.lr = 0.1
         self.gamma = 0.9
         self.epsilon = 0.9
@@ -43,17 +44,25 @@ class CoordinationCore:
         
         reward = -1
         
+        # Big reward if flag is captured (State index 3 is flag_captured)
         if new_state[3] and not prev_state[3]:
             return 100 
             
+        # Reward for scanning successfully (State index 0 is scanned)
         if new_state[0] and not prev_state[0] and action == "DEPLOY_RECON":
             return 10
             
-        if action == "DEPLOY_EXPLOIT" and not prev_state[0]:
+        # Punish for trying to attack before scanning
+        if (action == "DEPLOY_SQLI" or action == "DEPLOY_XSS") and not prev_state[0]:
             return -50
 
+        # Punish for scanning again if already scanned
         if action == "DEPLOY_RECON" and prev_state[0]:
             return -10
+
+        # Slight punishment for waiting too long
+        if action == "WAIT":
+            return -2
 
         return reward
 
@@ -63,5 +72,14 @@ class CoordinationCore:
 
     def load_brain(self):
         if os.path.exists(self.filename):
-            with open(self.filename, 'rb') as f:
-                self.q_table = pickle.load(f)
+            try:
+                with open(self.filename, 'rb') as f:
+                    data = pickle.load(f)
+                    # Check if loaded brain matches new action size
+                    first_key = next(iter(data))
+                    if len(data[first_key]) == len(self.actions):
+                        self.q_table = data
+                    else:
+                        print(f"{Fore.YELLOW}[System] Brain architecture changed (New Actions). Resetting memory.{Fore.RESET}")
+            except:
+                pass

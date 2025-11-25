@@ -67,17 +67,26 @@ def main():
 
     print(f"{Fore.YELLOW}=== MISSION STARTING AGAINST {target_url} ==={Fore.RESET}")
     
-    for step in range(15):
+    # Increased steps to allow for multiple attack types
+    for step in range(20):
         print(f"\n--- Mission Step {step+1} ---")
         
         current_state_key = commander.get_state_key()
         action_name, action_idx = commander.choose_action()
         print(f"{Fore.MAGENTA}[Commander] Decision: {action_name}{Fore.RESET}")
         
+        # --- UPDATED DISPATCHER LOGIC ---
         if action_name == "DEPLOY_RECON":
             recon_team.run()
-        elif action_name == "DEPLOY_EXPLOIT":
-            exploit_team.run()
+            
+        elif action_name == "DEPLOY_SQLI":
+            # Runs the original SQL injection code
+            exploit_team.run() 
+            
+        elif action_name == "DEPLOY_XSS":
+            # Runs the NEW XSS injection code
+            exploit_team.run_xss()
+            
         elif action_name == "WAIT":
             print("Standing by...")
 
@@ -88,7 +97,7 @@ def main():
         print(f"[RL] Reward: {reward} | Flag Captured: {bb.state['flag_captured']}")
         
         if bb.state["flag_captured"]:
-            print(f"\n{Fore.GREEN}MISSION ACCOMPLISHED.{Fore.RESET}")
+            print(f"\n{Fore.GREEN}MISSION ACCOMPLISHED (Flag Captured).{Fore.RESET}")
             break
             
         time.sleep(1)

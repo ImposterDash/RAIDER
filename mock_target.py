@@ -20,6 +20,8 @@ LOGIN_PAGE = """
             <button type="submit" style="width: 100%; padding: 10px; background: #007bff; color: white; border: none; cursor: pointer;">Login</button>
         </form>
         <p style="color: red;">{{ error }}</p>
+        <br>
+        <a href="/feedback" style="color: #666; font-size: 0.9em;">Leave Feedback</a>
     </div>
 </body>
 </html>
@@ -49,6 +51,32 @@ SQL_ERROR_PAGE = """
 </body></html>
 """
 
+# --- NEW VULNERABLE PAGE FOR XSS ---
+FEEDBACK_PAGE = """
+<!DOCTYPE html>
+<html>
+<head><title>SecureCorp Feedback</title></head>
+<body style="font-family: sans-serif; text-align: center; padding-top: 50px; background-color: #fff8e1;">
+    <div style="background: white; width: 400px; margin: auto; padding: 20px; border-radius: 8px; border: 1px solid #ffe0b2;">
+        <h2>Customer Feedback</h2>
+        <p>We value your opinion!</p>
+        <form action="/feedback" method="GET">
+            <input type="text" name="msg" placeholder="Your message..." style="width: 80%; padding: 8px;">
+            <button type="submit">Submit</button>
+        </form>
+        <br>
+        <div style="text-align: left; padding: 10px; background: #f9f9f9; border: 1px solid #eee;">
+            <strong>Recent Feedback:</strong><br>
+            <!-- VULNERABILITY: Input is reflected without sanitization -->
+            <span>REPLACE_FEEDBACK</span>
+        </div>
+        <br>
+        <a href="/">Back to Login</a>
+    </div>
+</body>
+</html>
+"""
+
 @app.route('/', methods=['GET'])
 def home():
     return render_template_string(LOGIN_PAGE)
@@ -68,6 +96,13 @@ def login():
 @app.route('/dashboard')
 def dashboard():
     return render_template_string(DASHBOARD_PAGE)
+
+# --- NEW XSS ROUTE ---
+@app.route('/feedback', methods=['GET'])
+def feedback():
+    msg = request.args.get('msg', '')
+    # INTENTIONAL VULNERABILITY: No escaping of 'msg'
+    return render_template_string(FEEDBACK_PAGE.replace('REPLACE_FEEDBACK', msg))
 
 def run_server():
     app.run(port=5000)
