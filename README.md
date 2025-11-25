@@ -3,7 +3,7 @@
 
 **RAIDER** is an autonomous AI Red Teaming system that combines **Reinforcement Learning (RL)** for strategic decision-making with **Large Language Models (LLM)** for tactical execution.
 
-Instead of hard-coded scripts, RAIDER uses a Q-Learning "Commander" to decide *when* to scan and *when* to attack, while an LLM-driven "Exploit Agent" analyzes web pages in real-time to generate context-aware SQL injection payloads.
+Instead of hard-coded scripts, RAIDER uses a Q-Learning "Commander" to decide *when* to scan and *which*  specific attack vector (SQLi or XSS) to deploy. An LLM-driven "Exploit Agent" analyzes web pages in real-time, navigates complex DOM structures (including iFrames), and generates context-aware payloads to bypass authentication or execute arbitrary JavaScript.
 
 ---
 
@@ -13,13 +13,15 @@ RAIDER operates using a **Blackboard Architecture** where specialized agents col
 
 1.  **The Commander (RL Core)** 
     * **Logic:** Q-Learning (Reinforcement Learning).
-    * **Role:** Learns the optimal "Kill Chain" order. It is rewarded for capturing flags and punished for premature attacks or stagnation.
+    * **Role:** Learns the optimal "Kill Chain" order. It dynamically chooses between **Recon**, **SQL Injection**, **XSS** or **WAIT** based on the target's state and previous rewards.
 2.  **The Discovery Agent (Recon)**
     * **Tools:** Nmap + Script Engine (```--script```).
     * **Role:** Identifies open ports, detects Operating Systems, fingerprints services, and scans for known vulnerabilities (CVEs).
 3.  **The Intelligent Agent (Exploit)**
-    * **Tools:** Google Gemini + Selenium.
-    * **Role:** Parses HTML structures, identifies login forms, and generates bespoke SQL injection payloads based on previous failure logs.
+    * **Tools:** Google Gemini + Selenium (Context-Aware).
+    * **Capabilities:**
+        * **SQL Injection:** Parses HTML forms to generate payloads that bypass login screens.
+        * **XSS:** Intelligently navigates through pages, prioritizes input vectors using AI, and performs deep scanning of iFrames to inject JavaScript payloads. 
 4.  **The Reporter**
     * **Tools:** FPDF.
     * **Role:** Compiles all agent findings, logs, and evidence into a professional PDF audit report at the end of the mission.
@@ -80,7 +82,9 @@ Enter Target URL (or press Enter for Localhost): # Just press Enter to activate 
 ```
 
 * **Target**: http://127.0.0.1:5000
-* **Goal**: Bypass the login screen and capture the flag ```FLAG{MULTI_AGENT_DOMINATION}```.
+* **Vulnerabilities to Find**: 
+    1. **SQL Injection**: Bypass the login screen and capture the flag ```FLAG{MULTI_AGENT_DOMINATION}```.
+    2. **XSS**: Inject scripts into the "Feedback" page (navigated to automatically by the AI).
 
 ### 2. Live Targeting (Admin Rights Recommended)
 You can point RAIDER at a specific URL or IP address (ensure you have permission!).
@@ -110,12 +114,14 @@ Enter Target URL (or press Enter for Localhost): # Enter the URL of the target w
 | File | Description |
 | :--- | :--- |
 | `main.py` | The entry point. Initializes the Blackboard, Agents, and starts the mission loop. |
-| `coordination_core.py` | Contains the RL logic (Q-Table) and reward calculation. |
-| `agents_exploit.py` | The LLM-driven agent. Uses Selenium to navigate and Gemini to generate attacks. |
+| `coordination_core.py` | The Reinforcement Learning brain (Q-Learning) that manages the strategic decision-making process, choosing between Recon, SQLi, XSS, and Wait actions based on rewards. |
+| `agents_exploit.py` | The AI-driven offensive unit. Leverages Selenium and Gemini to perform SQL Injection and XSS attacks. |
 | `agents_recon.py` | The scanner agent. Wraps Nmap to perform deep inspection. |
 | `blackboard.py` | Shared memory state. Agents read/write findings here. |
 | `reporting.py` | Generates professional PDF audit reports from mission data. |
 | `mock_target.py` | A vulnerable Flask application used for training and demo purposes. |
+| `train_manager.py` | Simulation script to pre-train the RL brain on the multi-vector attack strategy. |
+| `inspect_brain.py` | A utility script to visualize the learned Q-Table policies, showing the agent's preferred actions for different system states. |
 | `mission_control.pkl` | The serialized "brain" of the RL agent (saved Q-Table). |
 
 ---
