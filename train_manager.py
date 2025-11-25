@@ -13,7 +13,6 @@ class MockReconAgent:
         self.board = blackboard
 
     def run(self):
-        # FIX: The data must be wrapped in a "ports" key to match Blackboard structure
         scan_data = {
             "ports": {5000: 'http', 22: 'ssh'},
             "os": "Linux (Mock)",
@@ -28,9 +27,7 @@ class MockSQLIAgent:
 
     def run(self):
         ports = self.board.state["ports"]
-        # Can only attack if HTTP is found
         if any('http' in s for s in ports.values()):
-            # 70% chance of success for training purposes
             if random.random() > 0.3: 
                 self.board.set_flag("FLAG{TRAINING_SQLI_DUMMY}")
                 return "ATTACK_SUCCESS"
@@ -45,9 +42,7 @@ class MockXSSAgent:
 
     def run(self):
         ports = self.board.state["ports"]
-        # Can only attack if HTTP is found
         if any('http' in s for s in ports.values()):
-            # 70% chance of success for training purposes
             if random.random() > 0.3: 
                 self.board.add_vuln("Reflected XSS found (Simulated)")
                 self.board.set_flag("FLAG{TRAINING_XSS_DUMMY}")
@@ -60,7 +55,6 @@ class MockXSSAgent:
 def train():
     print(f"{Fore.CYAN}=== STARTING ROBUST TRAINING SIMULATION (SQLi + XSS) ==={Fore.RESET}")
     
-    # Recommendation: Delete old brain to start fresh if structure changed
     if os.path.exists("mission_control.pkl"):
         print(f"{Fore.YELLOW}[System] Note: Using existing brain. If behavior is poor, delete 'mission_control.pkl' and retry.{Fore.RESET}")
 
@@ -82,7 +76,6 @@ def train():
         total_reward = 0
         done = False
         
-        # Annealing Epsilon (Explore less as we learn more)
         if episode > 50: commander.epsilon = 0.8
         if episode > 100: commander.epsilon = 0.9
         if episode > 150: commander.epsilon = 0.98
@@ -94,7 +87,6 @@ def train():
             state = commander.get_state_key()
             action, action_idx = commander.choose_action()
             
-            # Execute Actions
             if action == "DEPLOY_RECON":
                 recon.run()
             elif action == "DEPLOY_SQLI":
@@ -107,7 +99,6 @@ def train():
             new_state = commander.get_state_key()
             reward = commander.calculate_reward(state, new_state, action)
             
-            # Manual shaping: Punish repeating same attack if state didn't change
             if state == new_state and (action == "DEPLOY_SQLI" or action == "DEPLOY_XSS"):
                 reward -= 10 
 

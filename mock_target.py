@@ -51,7 +51,6 @@ SQL_ERROR_PAGE = """
 </body></html>
 """
 
-# --- NEW VULNERABLE PAGE FOR XSS ---
 FEEDBACK_PAGE = """
 <!DOCTYPE html>
 <html>
@@ -97,11 +96,9 @@ def login():
 def dashboard():
     return render_template_string(DASHBOARD_PAGE)
 
-# --- NEW XSS ROUTE ---
 @app.route('/feedback', methods=['GET'])
 def feedback():
     msg = request.args.get('msg', '')
-    # INTENTIONAL VULNERABILITY: No escaping of 'msg'
     return render_template_string(FEEDBACK_PAGE.replace('REPLACE_FEEDBACK', msg))
 
 def run_server():
