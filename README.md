@@ -131,7 +131,7 @@ Enter Target URL (or press Enter for Localhost): # Enter the URL of the target w
 | File | Description |
 | :--- | :--- |
 | `gui_app.py` | A modern GUI dashboard for interactive mission control, visualization, and real-time monitoring. |
-| `main.py` | The entry point. Initializes the Blackboard, Agents, and starts the mission loop. |
+| `main.py` | The CLI entry point. Initializes the Blackboard, Agents, and starts the mission loop. |
 | `coordination_core.py` | The Reinforcement Learning brain (Q-Learning) that manages the strategic decision-making process, choosing between Recon, SQLi, XSS, and Wait actions based on rewards. |
 | `agents_exploit.py` | The AI-driven offensive unit. Leverages Selenium and Gemini to perform SQL Injection and XSS attacks. |
 | `agents_recon.py` | The scanner agent. Wraps Nmap to perform deep inspection. |
