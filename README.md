@@ -75,7 +75,22 @@ The Python library (`python-nmap`) is only a wrapper.
 
 ## Usage
 
-### 1. Quick Start (Mock Mode)
+### 1. GUI (Interactive Dashboard)
+For a visual experience with real-time feedback, mission control, and intelligence monitoring, launch the graphical dashboard.
+
+```bash
+python gui_app.py
+```
+
+* **Features:**
+    * **Mission Control:** Start, Pause, Resume, and Terminate missions with a click.
+    * **Real-time Intelligence:** View open ports, OS detection, and vulnerability findings as they happen in the "Intelligence" panel.
+    * **Live Logs:** Watch the agents collaborate in the integrated console.
+    * **Metric Visualization:** Track the RL Agent's rewards and current step progress.
+    * **One-Click Reporting:** Open the generated PDF report directly from the dashboard upon completion.
+
+### 2. CLI (Command Line Interface)
+### Option A: Quick Start (Mock Mode)
 To see RAIDER in action without an external target, simply run the main script and press **ENTER** when prompted for a URL. This launches a local vulnerable Flask server (The "SecureCorp Bank").
 
 ```bash
@@ -88,7 +103,7 @@ Enter Target URL (or press Enter for Localhost): # Just press Enter to activate 
     1. **SQL Injection**: Bypass the login screen and capture the flag ```FLAG{MULTI_AGENT_DOMINATION}```.
     2. **XSS**: Inject scripts into the "Feedback" page (navigated to automatically by the AI).
 
-### 2. Live Targeting (Admin Rights Recommended)
+### Option B: Live Targeting (Admin Rights Recommended)
 You can point RAIDER at a specific URL or IP address (ensure you have permission!).
 
 For Deep Recon (OS Detection & UDP Scans), run the script with Administrator/Root privileges.
@@ -115,6 +130,7 @@ Enter Target URL (or press Enter for Localhost): # Enter the URL of the target w
 
 | File | Description |
 | :--- | :--- |
+| `gui_app.py` | A modern GUI dashboard for interactive mission control, visualization, and real-time monitoring. |
 | `main.py` | The entry point. Initializes the Blackboard, Agents, and starts the mission loop. |
 | `coordination_core.py` | The Reinforcement Learning brain (Q-Learning) that manages the strategic decision-making process, choosing between Recon, SQLi, XSS, and Wait actions based on rewards. |
 | `agents_exploit.py` | The AI-driven offensive unit. Leverages Selenium and Gemini to perform SQL Injection and XSS attacks. |
