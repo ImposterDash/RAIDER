@@ -11,7 +11,6 @@ from urllib.parse import urlparse
 from dotenv import load_dotenv
 from tkinter import END
 
-# Import RAIDER Modules
 from mock_target import run_server
 from blackboard import Blackboard
 from coordination_core import CoordinationCore
@@ -19,7 +18,6 @@ from agents_recon import ReconAgent
 from agents_exploit import ExploitAgent
 from reporting import Reporter
 
-# Configuration
 ctk.set_appearance_mode("Dark")
 ctk.set_default_color_theme("dark-blue")
 
@@ -27,7 +25,6 @@ load_dotenv()
 API_KEY = os.getenv("GEMINI_API_KEY")
 
 class TextRedirector:
-    """Redirects stdout/stderr to a Tkinter Text widget"""
     def __init__(self, widget, tag="stdout"):
         self.widget = widget
         self.tag = tag
@@ -36,7 +33,6 @@ class TextRedirector:
     def write(self, string):
         if not string: return
         
-        # FIX: Handle bytes input (common with Flask/Click output)
         if isinstance(string, bytes):
             try:
                 string = string.decode('utf-8', errors='replace')
@@ -45,7 +41,6 @@ class TextRedirector:
 
         clean_str = self.ansi_escape.sub('', string)
         try:
-            # Schedule update on main thread to prevent crashing
             self.widget.after(0, self._append_text, clean_str)
         except:
             pass
@@ -70,7 +65,7 @@ class MissionThread(threading.Thread):
         self.daemon = True
         self.stop_event = threading.Event()
         self.pause_event = threading.Event()
-        self.pause_event.set() # Set to True means "Running", False means "Paused"
+        self.pause_event.set()
 
     def resolve_target(self, user_input):
         print(f"[System] Resolving Target: '{user_input}'...")
@@ -92,7 +87,6 @@ class MissionThread(threading.Thread):
             return None
 
     def run(self):
-        # 1. Setup Target
         target_ip = "127.0.0.1"
         target_url = "http://127.0.0.1:5000"
 
@@ -113,7 +107,6 @@ class MissionThread(threading.Thread):
             except Exception as e:
                 print(f"[Warning] Server start issue (might be already running): {e}")
 
-        # 2. Initialize Blackboard & Agents
         bb = Blackboard()
         bb.state["target_ip"] = target_ip 
         bb.state["target_url"] = target_url
@@ -130,21 +123,17 @@ class MissionThread(threading.Thread):
         xss_failures = 0
         MAX_FAILURES = 3
 
-        # 3. Mission Loop
         for step in range(30):
-            # Check Stop
             if self.stop_event.is_set():
                 print(f"\n[System] Mission Terminated by User.")
                 break
                 
-            # Check Pause
             if not self.pause_event.is_set():
                 print(f"[System] Mission Paused. Waiting for resume...")
                 self.app.update_status_labels("PAUSED")
-                self.pause_event.wait() # Blocks here until set() is called
+                self.pause_event.wait()
                 print(f"[System] Mission Resumed.")
                 
-                # Double check stop in case we terminated while paused
                 if self.stop_event.is_set(): 
                     print(f"\n[System] Mission Terminated by User.")
                     break
@@ -227,7 +216,6 @@ class MissionThread(threading.Thread):
         report_file = reporter.generate_report()
         print(f"[System] Report saved to: {report_file}")
         
-        # Trigger UI update on main thread
         self.app.after(0, lambda: self.app.on_mission_complete(report_file))
         
         self.app.mission_running = False
@@ -240,7 +228,6 @@ class RaiderDashboard(ctk.CTk):
         self.title("RAIDER | Autonomous AI Red Teaming System")
         self.geometry("1200x800")
         
-        # Maximize Window by default (Platform specific)
         self.after(0, lambda: self.state('zoomed') if sys.platform == 'win32' else self.attributes('-zoomed', True))
         
         self.grid_columnconfigure(1, weight=1)
@@ -252,42 +239,37 @@ class RaiderDashboard(ctk.CTk):
         self.thread = None
         self.current_report = None
         
-        # Define Colors
         self.col_active_green = "#008000"
         self.col_active_orange = "#FFA500"
         self.col_active_blue = "#1E90FF"
         self.col_active_red = "#8B0000"
         self.col_active_purple = "#800080"
-        self.col_disabled = "#333333" # Dark Charcoal for better contrast than default gray
+        self.col_disabled = "#333333"
 
         self.setup_sidebar()
         self.setup_main_area()
         self.setup_right_panel()
         
-        # Redirect stdout/stderr globally
         sys.stdout = TextRedirector(self.console_text)
         sys.stderr = TextRedirector(self.console_text)
 
     def setup_sidebar(self):
         self.sidebar_frame = ctk.CTkFrame(self, width=220, corner_radius=0)
         self.sidebar_frame.grid(row=0, column=0, sticky="nsew")
-        self.sidebar_frame.grid_rowconfigure(11, weight=1) # Spacer at bottom
+        self.sidebar_frame.grid_rowconfigure(11, weight=1)
 
         self.logo_label = ctk.CTkLabel(self.sidebar_frame, text="RAIDER\nCOMMAND", font=ctk.CTkFont(family="Consolas", size=24, weight="bold"))
         self.logo_label.grid(row=0, column=0, padx=20, pady=(30, 20))
 
-        # Input Group
         self.target_entry = ctk.CTkEntry(self.sidebar_frame, placeholder_text="Target URL", font=ctk.CTkFont(family="Consolas", size=12))
         self.target_entry.grid(row=1, column=0, padx=20, pady=(0, 5))
         
         self.target_hint = ctk.CTkLabel(self.sidebar_frame, text="(Leave empty for Local Mock)", text_color="gray", font=ctk.CTkFont(size=10))
         self.target_hint.grid(row=2, column=0, padx=20, pady=(0, 20))
 
-        # --- CONTROLS ---
         self.start_button = ctk.CTkButton(self.sidebar_frame, text="▶ DEPLOY MISSION", command=self.start_mission, fg_color=self.col_active_green, hover_color="#006400", font=ctk.CTkFont(weight="bold"))
         self.start_button.grid(row=3, column=0, padx=20, pady=5)
         
-        # Separator line
         self.sep = ctk.CTkFrame(self.sidebar_frame, height=2, fg_color="#2b2b2b")
         self.sep.grid(row=4, column=0, padx=20, pady=15, sticky="ew")
 
@@ -300,11 +282,9 @@ class RaiderDashboard(ctk.CTk):
         self.term_button = ctk.CTkButton(self.sidebar_frame, text="⏹ TERMINATE", command=self.terminate_mission, state="disabled", fg_color=self.col_disabled)
         self.term_button.grid(row=7, column=0, padx=20, pady=(5, 30))
 
-        # --- REPORT BUTTON ---
         self.report_btn = ctk.CTkButton(self.sidebar_frame, text="📄 VIEW REPORT", command=self.open_report, state="disabled", fg_color=self.col_disabled)
         self.report_btn.grid(row=8, column=0, padx=20, pady=(0, 20))
 
-        # --- STATUS ---
         self.status_frame = ctk.CTkFrame(self.sidebar_frame, fg_color="transparent")
         self.status_frame.grid(row=9, column=0, padx=20, sticky="w")
         
@@ -323,30 +303,25 @@ class RaiderDashboard(ctk.CTk):
         self.main_frame.grid_rowconfigure(1, weight=1)
         self.main_frame.grid_columnconfigure(0, weight=1)
 
-        # Top Stats Cards Container
         self.stats_container = ctk.CTkFrame(self.main_frame, fg_color="transparent")
         self.stats_container.grid(row=0, column=0, sticky="ew", pady=(0, 20))
         self.stats_container.grid_columnconfigure((0,1,2), weight=1)
 
-        # Card 1: Step
         self.card_step = ctk.CTkFrame(self.stats_container, height=60, corner_radius=10, fg_color="#1f1f1f")
         self.card_step.grid(row=0, column=0, sticky="ew", padx=(0, 10))
         self.stat_step = ctk.CTkLabel(self.card_step, text="STEP: 0/30", font=ctk.CTkFont(family="Consolas", size=16, weight="bold"))
         self.stat_step.place(relx=0.5, rely=0.5, anchor="center")
 
-        # Card 2: Reward
         self.card_reward = ctk.CTkFrame(self.stats_container, height=60, corner_radius=10, fg_color="#1f1f1f")
         self.card_reward.grid(row=0, column=1, sticky="ew", padx=10)
         self.stat_reward = ctk.CTkLabel(self.card_reward, text="REWARD: 0", font=ctk.CTkFont(family="Consolas", size=16, weight="bold"))
         self.stat_reward.place(relx=0.5, rely=0.5, anchor="center")
 
-        # Card 3: Action
         self.card_action = ctk.CTkFrame(self.stats_container, height=60, corner_radius=10, fg_color="#1f1f1f")
         self.card_action.grid(row=0, column=2, sticky="ew", padx=(10, 0))
         self.current_action = ctk.CTkLabel(self.card_action, text="WAITING", font=ctk.CTkFont(family="Consolas", size=16, weight="bold"), text_color="#00BFFF")
         self.current_action.place(relx=0.5, rely=0.5, anchor="center")
 
-        # Console
         self.console_frame = ctk.CTkFrame(self.main_frame, corner_radius=10)
         self.console_frame.grid(row=1, column=0, sticky="nsew")
         
@@ -369,8 +344,6 @@ class RaiderDashboard(ctk.CTk):
         self.intel_text.insert("0.0", "Waiting for Recon...")
         self.intel_text.configure(state="disabled")
 
-    # --- ACTION HANDLERS ---
-    
     def start_mission(self):
         if self.mission_running: return
         
@@ -379,7 +352,6 @@ class RaiderDashboard(ctk.CTk):
         self.is_paused = False
         self.current_report = None
         
-        # Enable controls, set colors for Active state
         self.start_button.configure(state="disabled", text="MISSION ACTIVE", fg_color=self.col_disabled)
         
         self.pause_button.configure(state="normal", fg_color=self.col_active_orange)
@@ -401,7 +373,6 @@ class RaiderDashboard(ctk.CTk):
             self.thread.pause_event.clear()
             self.is_paused = True
             
-            # Switch Colors to indicate State
             self.pause_button.configure(state="disabled", fg_color=self.col_disabled)
             self.resume_button.configure(state="normal", fg_color=self.col_active_blue)
             
@@ -412,7 +383,6 @@ class RaiderDashboard(ctk.CTk):
             self.thread.pause_event.set()
             self.is_paused = False
             
-            # Switch Colors back
             self.pause_button.configure(state="normal", fg_color=self.col_active_orange)
             self.resume_button.configure(state="disabled", fg_color=self.col_disabled)
             
@@ -431,7 +401,6 @@ class RaiderDashboard(ctk.CTk):
             self.term_button.configure(state="disabled", fg_color=self.col_disabled)
 
     def on_mission_complete(self, report_path):
-        """Called by thread when report is ready"""
         self.current_report = report_path
         self.report_btn.configure(state="normal", fg_color=self.col_active_purple)
         print(f"[UI] Report ready: {report_path}")
@@ -442,11 +411,11 @@ class RaiderDashboard(ctk.CTk):
         
         try:
             path = os.path.abspath(self.current_report)
-            if platform.system() == 'Darwin':       # macOS
+            if platform.system() == 'Darwin':
                 subprocess.call(('open', path))
-            elif platform.system() == 'Windows':    # Windows
+            elif platform.system() == 'Windows':
                 os.startfile(path)
-            else:                                   # Linux
+            else:
                 subprocess.call(('xdg-open', path))
         except Exception as e:
             print(f"[Error] Could not open report: {e}")
@@ -462,8 +431,6 @@ class RaiderDashboard(ctk.CTk):
         self.target_entry.configure(state="normal")
         self.current_action.configure(text="WAITING", text_color="#00BFFF")
         self.update_status_labels("IDLE")
-
-    # --- UPDATE HELPERS ---
 
     def update_status_labels(self, status):
         if status == "IDLE":
