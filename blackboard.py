@@ -17,6 +17,11 @@ class Blackboard:
             "vulnerabilities": [],
             "credentials": [],        
             "flag_captured": False,
+            
+            # NEW: Track specific attack successes independently
+            "sqli_success": False,
+            "xss_success": False,
+            
             "activity_log": []
         }
 
@@ -38,7 +43,9 @@ class Blackboard:
         if "vulns" in scan_data: self.state["network_vulns"].extend(scan_data["vulns"])
 
         self.state["scanned"] = True
-        self.log_event("Blackboard", "Scan Data Updated", f"Found {len(self.state['ports'])} ports")
+        
+        # CHANGED: Source is now ReconAgent instead of Blackboard for better reporting
+        self.log_event("ReconAgent", "Scan Data Updated", f"Found {len(self.state['ports'])} ports")
         
         print(f"\n{Fore.CYAN}[Blackboard] INTELLIGENCE UPDATE:{Fore.RESET}")
         print(f"   :: Open Ports: {list(self.state['ports'].keys())}")
@@ -63,6 +70,15 @@ class Blackboard:
         print(f"\n{Fore.GREEN}[Blackboard] CRITICAL: Flag Captured -> {flag}{Fore.RESET}")
 
     def get_rl_state(self):
+        """
+        Returns a tuple representing the state for the RL Agent.
+        Structure: (scanned, has_http, sqli_done, xss_done)
+        """
         has_http = any(s == 'http' or s == 'http-alt' for s in self.state["ports"].values())
-        has_vuln = len(self.state["vulnerabilities"]) > 0 or len(self.state["network_vulns"]) > 0
-        return (self.state["scanned"], has_http, has_vuln, self.state["flag_captured"])
+        
+        return (
+            self.state["scanned"], 
+            has_http, 
+            self.state["sqli_success"], 
+            self.state["xss_success"]
+        )

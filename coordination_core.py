@@ -40,21 +40,40 @@ class CoordinationCore:
         self.save_brain()
 
     def calculate_reward(self, prev_state, new_state, action):
-        
+        """
+        State structure: (scanned, has_http, sqli_success, xss_success)
+        Indices:         0        1         2             3
+        """
         reward = -1
         
+        # 1. Reward for NEW SQLi Success
+        if new_state[2] and not prev_state[2]:
+            return 100 
+
+        # 2. Reward for NEW XSS Success
         if new_state[3] and not prev_state[3]:
             return 100 
             
+        # 3. Reward for Recon completion
         if new_state[0] and not prev_state[0] and action == "DEPLOY_RECON":
             return 10
             
+        # 4. Punish attacking before Recon
         if (action == "DEPLOY_SQLI" or action == "DEPLOY_XSS") and not prev_state[0]:
             return -50
 
+        # 5. Punish Recon if already scanned
         if action == "DEPLOY_RECON" and prev_state[0]:
             return -10
 
+        # 6. Punish Repeating Attacks (If SQLi is already done, don't do it again)
+        if action == "DEPLOY_SQLI" and prev_state[2]:
+            return -50
+            
+        if action == "DEPLOY_XSS" and prev_state[3]:
+            return -50
+
+        # 7. Punish Waiting
         if action == "WAIT":
             return -2
 
@@ -70,9 +89,10 @@ class CoordinationCore:
                 with open(self.filename, 'rb') as f:
                     data = pickle.load(f)
                     first_key = next(iter(data))
+                    # Basic integrity check
                     if len(data[first_key]) == len(self.actions):
                         self.q_table = data
                     else:
-                        print(f"{Fore.YELLOW}[System] Brain architecture changed (New Actions). Resetting memory.{Fore.RESET}")
+                        print(f"{Fore.YELLOW}[System] Brain architecture changed. Resetting memory.{Fore.RESET}")
             except:
                 pass

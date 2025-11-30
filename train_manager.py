@@ -27,9 +27,11 @@ class MockSQLIAgent:
 
     def run(self):
         ports = self.board.state["ports"]
+        # Only work if HTTP is found
         if any('http' in s for s in ports.values()):
             if random.random() > 0.3: 
                 self.board.set_flag("FLAG{TRAINING_SQLI_DUMMY}")
+                self.board.state["sqli_success"] = True # <--- Explicitly set success state
                 return "ATTACK_SUCCESS"
             else:
                 return "ATTACK_FAILED"
@@ -46,6 +48,7 @@ class MockXSSAgent:
             if random.random() > 0.3: 
                 self.board.add_vuln("Reflected XSS found (Simulated)")
                 self.board.set_flag("FLAG{TRAINING_XSS_DUMMY}")
+                self.board.state["xss_success"] = True # <--- Explicitly set success state
                 return "ATTACK_SUCCESS"
             else:
                 return "ATTACK_FAILED"
@@ -53,7 +56,8 @@ class MockXSSAgent:
             return "ATTACK_FAILED"
 
 def train():
-    print(f"{Fore.CYAN}=== STARTING ROBUST TRAINING SIMULATION (SQLi + XSS) ==={Fore.RESET}")
+    print(f"{Fore.CYAN}=== STARTING MULTI-OBJECTIVE TRAINING SIMULATION (SQLi + XSS) ==={Fore.RESET}")
+    print(f"{Fore.YELLOW}[Info] The agent will now learn to perform BOTH attacks in a single run.{Fore.RESET}")
     
     if os.path.exists("mission_control.pkl"):
         print(f"{Fore.YELLOW}[System] Note: Using existing brain. If behavior is poor, delete 'mission_control.pkl' and retry.{Fore.RESET}")
@@ -99,18 +103,19 @@ def train():
             new_state = commander.get_state_key()
             reward = commander.calculate_reward(state, new_state, action)
             
-            if state == new_state and (action == "DEPLOY_SQLI" or action == "DEPLOY_XSS"):
-                reward -= 10 
-
             commander.learn(state, action_idx, reward, new_state)
             total_reward += reward
             
-            if bb.state["flag_captured"]:
+            # Stop only if BOTH attacks are successful
+            if bb.state["sqli_success"] and bb.state["xss_success"]:
                 done = True
-                print(f"{Fore.GREEN}WIN{Fore.RESET} ({total_reward})", end="\r")
+                print(f"{Fore.GREEN}PERFECT RUN{Fore.RESET} ({total_reward})", end="\r")
             
-        if not bb.state["flag_captured"]:
-            print(f"{Fore.RED}FAIL{Fore.RESET} ({total_reward})", end="\r")
+        if not (bb.state["sqli_success"] and bb.state["xss_success"]):
+            if bb.state["sqli_success"] or bb.state["xss_success"]:
+                print(f"{Fore.YELLOW}PARTIAL{Fore.RESET} ({total_reward})", end="\r")
+            else:
+                print(f"{Fore.RED}FAIL{Fore.RESET} ({total_reward})", end="\r")
             
         print("")
 
