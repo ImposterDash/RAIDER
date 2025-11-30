@@ -27,11 +27,10 @@ class MockSQLIAgent:
 
     def run(self):
         ports = self.board.state["ports"]
-        # Only work if HTTP is found
         if any('http' in s for s in ports.values()):
             if random.random() > 0.3: 
                 self.board.set_flag("FLAG{TRAINING_SQLI_DUMMY}")
-                self.board.state["sqli_success"] = True # <--- Explicitly set success state
+                self.board.state["sqli_success"] = True
                 return "ATTACK_SUCCESS"
             else:
                 return "ATTACK_FAILED"
@@ -48,7 +47,7 @@ class MockXSSAgent:
             if random.random() > 0.3: 
                 self.board.add_vuln("Reflected XSS found (Simulated)")
                 self.board.set_flag("FLAG{TRAINING_XSS_DUMMY}")
-                self.board.state["xss_success"] = True # <--- Explicitly set success state
+                self.board.state["xss_success"] = True
                 return "ATTACK_SUCCESS"
             else:
                 return "ATTACK_FAILED"
@@ -106,7 +105,6 @@ def train():
             commander.learn(state, action_idx, reward, new_state)
             total_reward += reward
             
-            # Stop only if BOTH attacks are successful
             if bb.state["sqli_success"] and bb.state["xss_success"]:
                 done = True
                 print(f"{Fore.GREEN}PERFECT RUN{Fore.RESET} ({total_reward})", end="\r")

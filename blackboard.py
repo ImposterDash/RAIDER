@@ -17,11 +17,8 @@ class Blackboard:
             "vulnerabilities": [],
             "credentials": [],        
             "flag_captured": False,
-            
-            # NEW: Track specific attack successes independently
             "sqli_success": False,
             "xss_success": False,
-            
             "activity_log": []
         }
 
@@ -44,7 +41,6 @@ class Blackboard:
 
         self.state["scanned"] = True
         
-        # CHANGED: Source is now ReconAgent instead of Blackboard for better reporting
         self.log_event("ReconAgent", "Scan Data Updated", f"Found {len(self.state['ports'])} ports")
         
         print(f"\n{Fore.CYAN}[Blackboard] INTELLIGENCE UPDATE:{Fore.RESET}")
@@ -70,10 +66,6 @@ class Blackboard:
         print(f"\n{Fore.GREEN}[Blackboard] CRITICAL: Flag Captured -> {flag}{Fore.RESET}")
 
     def get_rl_state(self):
-        """
-        Returns a tuple representing the state for the RL Agent.
-        Structure: (scanned, has_http, sqli_done, xss_done)
-        """
         has_http = any(s == 'http' or s == 'http-alt' for s in self.state["ports"].values())
         
         return (

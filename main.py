@@ -67,10 +67,9 @@ def main():
 
     print(f"{Fore.YELLOW}=== MISSION STARTING AGAINST {target_url} ==={Fore.RESET}")
     
-    # === FAILURE TRACKING FOR EARLY STOPPING ===
     sqli_failures = 0
     xss_failures = 0
-    MAX_FAILURES = 3 # If an attack fails three times, we give up on it.
+    MAX_FAILURES = 3
 
     for step in range(30):
         print(f"\n--- Mission Step {step+1} ---")
@@ -79,7 +78,6 @@ def main():
         action_name, action_idx = commander.choose_action()
         print(f"{Fore.MAGENTA}[Commander] Decision: {action_name}{Fore.RESET}")
         
-        # Execute Action with Smart Skipping
         result = "WAIT"
         
         if action_name == "DEPLOY_RECON":
@@ -110,25 +108,20 @@ def main():
         elif action_name == "WAIT":
             print("Standing by...")
 
-        # Learning Step
         new_state_key = commander.get_state_key()
         reward = commander.calculate_reward(current_state_key, new_state_key, action_name)
         
-        # Heavy Penalty for trying a dead-end attack (Helps brain learn faster)
         if result == "SKIPPED":
             reward = -100
             
         commander.learn(current_state_key, action_idx, reward, new_state_key)
         
-        # === STATUS CHECK ===
         sqli_status = 'DONE' if bb.state['sqli_success'] else ('GIVEN UP' if sqli_failures >= MAX_FAILURES else 'PENDING')
         xss_status = 'DONE' if bb.state['xss_success'] else ('GIVEN UP' if xss_failures >= MAX_FAILURES else 'PENDING')
         
         stats = f"Reward: {reward} | SQLi: {sqli_status} | XSS: {xss_status}"
         print(f"[RL] {stats}")
         
-        # === EARLY EXIT CONDITION ===
-        # Stop if SQLi is (Done OR Failed) AND XSS is (Done OR Failed)
         sqli_finished = bb.state["sqli_success"] or sqli_failures >= MAX_FAILURES
         xss_finished = bb.state["xss_success"] or xss_failures >= MAX_FAILURES
         

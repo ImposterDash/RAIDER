@@ -132,7 +132,6 @@ class Reporter:
         pdf.add_page()
         pdf.chapter_title("4. Mission Audit Log (Timeline)")
         
-        # Table Header Configuration
         w_time = 25
         w_agent = 35
         w_event = 40
@@ -153,36 +152,27 @@ class Reporter:
             time_str = log['time']
             source = self.clean_text(log['source'])
             event = self.clean_text(log['event'])
-            details = self.clean_text(str(log['details'])) # No truncation
+            details = self.clean_text(str(log['details']))
             
-            # Smart Page Break: If close to bottom (A4 height is ~297mm), add page
             if pdf.get_y() > 250:
                 pdf.add_page()
                 print_table_header()
 
-            # --- Row Height Calculation ---
-            # 1. Save current position
             x_start = pdf.get_x()
             y_start = pdf.get_y()
             
-            # 2. Print the 'Details' column first (conceptually) to measure height
-            # Move cursor to where the details column starts
             pdf.set_xy(x_start + w_time + w_agent + w_event, y_start)
             
-            # Use MultiCell for text wrapping
             pdf.multi_cell(w_details, line_height, details, 1, 'L')
             
-            # 3. Calculate total height of this row based on how much Y increased
             y_end = pdf.get_y()
             row_height = y_end - y_start
             
-            # 4. Go back and print the other cells with this calculated height
             pdf.set_xy(x_start, y_start)
             pdf.cell(w_time, row_height, time_str, 1)
             pdf.cell(w_agent, row_height, source, 1)
             pdf.cell(w_event, row_height, event, 1)
             
-            # 5. Move cursor to the end of the row (ready for next loop)
             pdf.set_y(y_end)
 
         pdf.output(self.filename)
