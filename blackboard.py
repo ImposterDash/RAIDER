@@ -37,11 +37,22 @@ class Blackboard:
         if "os" in scan_data: self.state["os_info"] = scan_data["os"]
         if "mac" in scan_data: self.state["mac_address"] = scan_data["mac"]
         if "hops" in scan_data: self.state["topology"] = scan_data["hops"]
-        if "vulns" in scan_data: self.state["network_vulns"].extend(scan_data["vulns"])
+        
+        if "vulns" in scan_data:
+            existing_vulns = set(self.state["network_vulns"])
+            new_count = 0
+            for v in scan_data["vulns"]:
+                if v not in existing_vulns:
+                    self.state["network_vulns"].append(v)
+                    new_count += 1
+            
+            if new_count > 0:
+                self.log_event("Blackboard", "Network Intel", f"Added {new_count} new findings")
+
+        if not self.state["scanned"]:
+             self.log_event("ReconAgent", "Scan Data Updated", f"Found {len(self.state['ports'])} ports")
 
         self.state["scanned"] = True
-        
-        self.log_event("ReconAgent", "Scan Data Updated", f"Found {len(self.state['ports'])} ports")
         
         print(f"\n{Fore.CYAN}[Blackboard] INTELLIGENCE UPDATE:{Fore.RESET}")
         print(f"   :: Open Ports: {list(self.state['ports'].keys())}")
@@ -56,9 +67,10 @@ class Blackboard:
         print(f"   :: MAC Address: {mac_disp}")
 
     def add_vuln(self, vuln_desc):
-        self.state["vulnerabilities"].append(vuln_desc)
-        self.log_event("Blackboard", "Vulnerability Confirmed", vuln_desc)
-        print(f"{Fore.RED}[Blackboard] Vulnerability Logged: {vuln_desc}{Fore.RESET}")
+        if vuln_desc not in self.state["vulnerabilities"]:
+            self.state["vulnerabilities"].append(vuln_desc)
+            self.log_event("Blackboard", "Vulnerability Confirmed", vuln_desc)
+            print(f"{Fore.RED}[Blackboard] Vulnerability Logged: {vuln_desc}{Fore.RESET}")
 
     def set_flag(self, flag):
         self.state["flag_captured"] = True

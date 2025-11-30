@@ -81,7 +81,11 @@ def main():
         result = "WAIT"
         
         if action_name == "DEPLOY_RECON":
-            result = recon_team.run()
+            if bb.state["scanned"]:
+                print(f"{Fore.YELLOW}[System] Skipping Recon (Already Scanned).{Fore.RESET}")
+                result = "SKIPPED"
+            else:
+                result = recon_team.run()
             
         elif action_name == "DEPLOY_SQLI":
             if bb.state["sqli_success"]:
