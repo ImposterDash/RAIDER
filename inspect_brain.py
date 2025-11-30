@@ -16,7 +16,7 @@ with open(filename, "rb") as f:
 
 actions = ["DEPLOY_RECON", "DEPLOY_SQLI", "DEPLOY_XSS", "WAIT"]
 
-print(f"\n{Fore.CYAN}=== REINFORCEMENT LEARNING BRAIN DUMP ==={Fore.RESET}")
+print(f"\n{Fore.CYAN}=== REINFORCEMENT LEARNING BRAIN ==={Fore.RESET}")
 print(f"{'STATE (Scan?, HTTP?, Vuln?, Flag?)':<40} | {'BEST ACTION':<15} | {'VALUES (Recon, SQLi, XSS, Wait)'}")
 print("-" * 110)
 
