@@ -8,3 +8,4 @@ colorama
 python-nmap
 numpy
 fpdf
+customtkinter
