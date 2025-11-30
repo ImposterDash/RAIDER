@@ -13,7 +13,7 @@ RAIDER operates using a **Blackboard Architecture** where specialized agents col
 
 1.  **The Commander (RL Core)** 
     * **Logic:** Q-Learning (Reinforcement Learning).
-    * **Role:** Learns the optimal "Kill Chain" order. It dynamically chooses between **Recon**, **SQL Injection**, **XSS** or **WAIT** based on the target's state and previous rewards.
+    * **Role:** Learns the optimal "Kill Chain" order. It dynamically chooses between **Recon**, **SQL Injection**, **XSS** or **WAIT** based on the target's state, previous actions and rewards.
 2.  **The Discovery Agent (Recon)**
     * **Tools:** Nmap + Script Engine (```--script```).
     * **Role:** Identifies open ports, detects Operating Systems, fingerprints services, and scans for known vulnerabilities (CVEs).
