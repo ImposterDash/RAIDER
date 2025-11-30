@@ -22,7 +22,9 @@ RAIDER operates using a **Blackboard Architecture** where specialized agents col
     * **Capabilities:**
         * **SQL Injection:** Parses HTML forms to generate payloads that bypass login screens.
         * **XSS:** Intelligently navigates through pages, prioritizes input vectors using AI, and performs deep scanning of iFrames to inject JavaScript payloads. 
-4.  **The Reporter**
+4.  **The Blackboard (Shared Memory)**
+    * **Role:** Acts as the central data repository. All agents read the mission state (scan results, flags, history) from here and publish their findings (vulnerabilities, logs) back to it, ensuring asynchronous collaboration.
+5.  **The Reporter**
     * **Tools:** FPDF.
     * **Role:** Compiles all agent findings, logs, and evidence into a professional PDF audit report at the end of the mission.
 
