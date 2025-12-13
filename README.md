@@ -19,7 +19,7 @@ Instead of hard-coded scripts, RAIDER uses a Q-Learning "Commander" to decide *w
 
 https://github.com/user-attachments/assets/8bbd0deb-cb1d-4662-8c1f-663ef6b341ca
 
-*Autonomous reconnaissance and exploitation using RL-driven decision making and LLM-based payload generation.*
+*Autonomous reconnaissance and exploitation using RL-driven decision making and LLM-based tactical execution.*
 
 ---
 
