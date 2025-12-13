@@ -7,6 +7,22 @@ Instead of hard-coded scripts, RAIDER uses a Q-Learning "Commander" to decide *w
 
 ---
 
+## Dashboard Preview
+
+![RAIDER Dashboard](figures/assets/RAIDER%20Dashboard.jpg)
+
+*The interactive RAIDER dashboard showing mission control, live intelligence, and agent logs in real time.*
+
+---
+
+## RAIDER in Action
+
+![RAIDER Execution Demo](figures/assets/RAIDER%20Demo.mp4)
+
+*Autonomous reconnaissance and exploitation using RL-driven decision making and LLM-based payload generation.*
+
+---
+
 ## Architecture
 
 RAIDER operates using a **Blackboard Architecture** where specialized agents collaborate:
